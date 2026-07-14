@@ -1,11 +1,15 @@
 from django.db import models
 from accounts.models import User
-
+from departments.models import Department
 
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    department = models.CharField(max_length=100)
+    department = models.ForeignKey(
+    Department,
+    on_delete=models.PROTECT,
+    related_name="doctors",
+)
 
     specialization = models.CharField(max_length=100)
 

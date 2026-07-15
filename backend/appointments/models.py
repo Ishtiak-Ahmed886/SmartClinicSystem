@@ -3,6 +3,7 @@ from doctors.models import Doctor
 from patients.models import Patient
 
 
+
 class Appointment(models.Model):
 
     STATUS_CHOICES = (
@@ -17,6 +18,9 @@ class Appointment(models.Model):
         on_delete=models.CASCADE,
         related_name="appointments",
     )
+
+  
+   
 
     patient = models.ForeignKey(
         Patient,

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'schedules',
     'queues',
     'prescriptions',
+    'payments',
     ]
 
 MIDDLEWARE = [

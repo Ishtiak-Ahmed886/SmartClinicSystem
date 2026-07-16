@@ -58,21 +58,26 @@ class Appointment(models.Model):
 
     def clean(self):
 
-        # একই Patient একই Doctor-এর কাছে একই দিনে একবারই Appointment নিতে পারবে
+        # Required fields check
+        if not self.doctor_id or not self.patient_id or not self.appointment_date:
+            return
+
+        # Duplicate Appointment Check
         if Appointment.objects.filter(
-            doctor=self.doctor,
-            patient=self.patient,
+            doctor_id=self.doctor_id,
+            patient_id=self.patient_id,
             appointment_date=self.appointment_date,
         ).exclude(pk=self.pk).exists():
+
             raise ValidationError(
                 "This patient already has an appointment with this doctor on this date."
             )
 
         # Maximum Patient Check
-        if self.schedule:
+        if self.schedule_id:
 
             total_patients = Appointment.objects.filter(
-                schedule=self.schedule,
+                schedule_id=self.schedule_id,
                 appointment_date=self.appointment_date,
             ).exclude(pk=self.pk).count()
 
@@ -81,19 +86,20 @@ class Appointment(models.Model):
                     f"Maximum {self.schedule.max_patients} patients are allowed for this schedule."
                 )
 
-        # Doctor এবং Schedule মিলতে হবে
-        if self.schedule and self.schedule.doctor != self.doctor:
-            raise ValidationError(
-                "Selected schedule does not belong to the selected doctor."
-            )
+            # Doctor & Schedule Match Check
+            if self.schedule.doctor_id != self.doctor_id:
+                raise ValidationError(
+                    "Selected schedule does not belong to the selected doctor."
+                )
 
     def save(self, *args, **kwargs):
 
-        # সব Validation চালাবে
+        # Validation
         self.full_clean()
 
-        # Auto Token Generate
+        # Auto Token
         if not self.token_number:
+
             last_token = Appointment.objects.filter(
                 doctor=self.doctor,
                 appointment_date=self.appointment_date,
@@ -101,7 +107,18 @@ class Appointment(models.Model):
 
             self.token_number = last_token + 1
 
+        # Save Appointment
         super().save(*args, **kwargs)
+
+        # Auto Create Queue
+        from queues.models import Queue
+
+        Queue.objects.get_or_create(
+            appointment=self,
+            defaults={
+                "queue_number": self.token_number,
+            }
+        )
 
     def __str__(self):
         return (

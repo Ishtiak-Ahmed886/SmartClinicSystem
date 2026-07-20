@@ -21,9 +21,11 @@ class AppointmentSerializer(serializers.ModelSerializer):
             appointment_time=appointment_time,
         )
 
+        # Update করার সময় নিজের record বাদ দিবে
         if self.instance:
             queryset = queryset.exclude(pk=self.instance.pk)
 
+        # Duplicate booking block
         if queryset.exists():
             raise serializers.ValidationError(
                 "This doctor already has an appointment at this time."

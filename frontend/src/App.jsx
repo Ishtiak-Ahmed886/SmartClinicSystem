@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Doctors from "./pages/Doctors";
 import Patients from "./pages/Patients";
 import Appointments from "./pages/Appointments";
+import Queue from "./pages/Queue";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/doctors" element={<Doctors />} />
         <Route path="/patients" element={<Patients />} />
         <Route path="/appointments" element={<Appointments />} />
+        <Route path="/queue" element={<Queue />} />
       </Routes>
     </BrowserRouter>
   );

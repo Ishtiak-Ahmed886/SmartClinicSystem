@@ -1,6 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+    const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    navigate("/");
+  };
   return (
     <div
       style={{
@@ -9,9 +16,33 @@ export default function Dashboard() {
         minHeight: "100vh",
       }}
     >
-      <h1 style={{ marginBottom: "2rem", fontSize: "2.2rem" }}>
-        🏥 Smart Clinic Dashboard
-      </h1>
+      <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "2rem",
+  }}
+>
+  <h1 style={{ margin: 0, fontSize: "2.2rem" }}>
+    🏥 Smart Clinic Dashboard
+  </h1>
+
+  <button
+    onClick={handleLogout}
+    style={{
+      padding: "0.75rem 1.25rem",
+      background: "#dc2626",
+      color: "white",
+      border: "none",
+      borderRadius: "10px",
+      cursor: "pointer",
+      fontWeight: "600",
+    }}
+  >
+    🚪 Logout
+  </button>
+</div>
 
       <div
         style={{

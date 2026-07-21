@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import api from "../api/axios";
+import { useEffect, useState } from 'react';
+import api from '../api/axios';
+import Layout from '../components/Layout';
 
 export default function Patients() {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchPatients();
@@ -12,213 +12,185 @@ export default function Patients() {
 
   const fetchPatients = async () => {
     try {
-      const response = await api.get("/patients/");
-
+      const response = await api.get('/patients/');
       setPatients(response.data.results || response.data);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load patients");
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Loading State
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          background: "#f3f4f6",
-        }}
-      >
+      <Layout>
         <h2>Loading patients...</h2>
-      </div>
-    );
-  }
-
-  // Error State
-  if (error) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          background: "#f3f4f6",
-        }}
-      >
-        <h2 style={{ color: "red" }}>{error}</h2>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div
-      style={{
-        padding: "2rem",
-        background: "#f3f4f6",
-        minHeight: "100vh",
-      }}
-    >
-      {/* Page Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "1.5rem",
-        }}
-      >
-        <h1 style={{ fontSize: "2rem", margin: 0 }}>
-          🧑‍🤝‍🧑 Patients List
-        </h1>
-
-        <div
-          style={{
-            background: "#059669",
-            color: "white",
-            padding: "0.5rem 1rem",
-            borderRadius: "999px",
-            fontWeight: "bold",
-          }}
-        >
-          Total: {patients.length}
-        </div>
-      </div>
-
-      {/* Table Container */}
-      <div
-        style={{
-          background: "white",
-          borderRadius: "16px",
-          overflow: "hidden",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-        }}
-      >
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-          }}
-        >
-          {/* Table Header */}
-          <thead
+    <Layout>
+      <div>
+        {/* Header */}
+        <div style={{ marginBottom: '2rem' }}>
+          <h1
             style={{
-              background: "#059669",
-              color: "white",
+              margin: 0,
+              fontSize: '2rem',
+              color: '#111827',
             }}
           >
-            <tr>
-              <th style={{ padding: "1rem", textAlign: "left" }}>ID</th>
-              <th style={{ padding: "1rem", textAlign: "left" }}>
-                User ID
-              </th>
-              <th style={{ padding: "1rem", textAlign: "left" }}>
-                Phone
-              </th>
-              <th style={{ padding: "1rem", textAlign: "left" }}>
-                Gender
-              </th>
-              <th style={{ padding: "1rem", textAlign: "left" }}>
-                Blood Group
-              </th>
-            </tr>
-          </thead>
+            🧑‍🤝‍🧑 Patients Management
+          </h1>
 
-          {/* Table Body */}
-          <tbody>
-            {patients.length > 0 ? (
-              patients.map((patient) => (
-                <tr
-                  key={patient.id}
-                  style={{
-                    borderBottom: "1px solid #e5e7eb",
-                    transition: "background 0.2s",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = "#f9fafb")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "white")
-                  }
-                >
-                  <td style={{ padding: "1rem", fontWeight: "600" }}>
-                    {patient.id}
-                  </td>
+          <p
+            style={{
+              color: '#6b7280',
+              marginTop: '0.5rem',
+            }}
+          >
+            Manage patient records, contact information, and medical profile data.
+          </p>
+        </div>
 
-                  <td style={{ padding: "1rem" }}>{patient.user}</td>
+        {/* Table Card */}
+        <div
+          style={{
+            background: 'white',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.06)',
+            border: '1px solid #f1f5f9',
+          }}
+        >
+          {/* Card Header */}
+          <div
+            style={{
+              padding: '1.25rem 1.5rem',
+              borderBottom: '1px solid #e5e7eb',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <h3 style={{ margin: 0, color: '#111827' }}>
+              Patients Directory
+            </h3>
 
-                  <td style={{ padding: "1rem" }}>
-                    {patient.phone || "N/A"}
-                  </td>
+            <span
+              style={{
+                background: '#dcfce7',
+                color: '#166534',
+                padding: '0.35rem 0.75rem',
+                borderRadius: '999px',
+                fontSize: '0.85rem',
+                fontWeight: '600',
+              }}
+            >
+              {patients.length} Registered
+            </span>
+          </div>
 
-                  <td style={{ padding: "1rem" }}>
-                    {patient.gender ? (
+          {/* Table */}
+          <div style={{ overflowX: 'auto' }}>
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+              }}
+            >
+              <thead
+                style={{
+                  background: '#2563eb',
+                  color: 'white',
+                }}
+              >
+                <tr>
+                  <th style={thStyle}>ID</th>
+                  <th style={thStyle}>User ID</th>
+                  <th style={thStyle}>Phone</th>
+                  <th style={thStyle}>Gender</th>
+                  <th style={thStyle}>Blood Group</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {patients.map((patient) => (
+                  <tr
+                    key={patient.id}
+                    style={{
+                      borderBottom: '1px solid #f1f5f9',
+                    }}
+                  >
+                    <td style={tdStyle}>
+                      <strong>{patient.id}</strong>
+                    </td>
+
+                    <td style={tdStyle}>{patient.user}</td>
+
+                    <td style={tdStyle}>
+                      {patient.phone || 'N/A'}
+                    </td>
+
+                    <td style={tdStyle}>
                       <span
                         style={{
                           background:
-                            patient.gender.toLowerCase() === "male"
-                              ? "#dbeafe"
-                              : "#fce7f3",
+                            patient.gender === 'male'
+                              ? '#dbeafe'
+                              : patient.gender === 'female'
+                              ? '#fce7f3'
+                              : '#f3f4f6',
                           color:
-                            patient.gender.toLowerCase() === "male"
-                              ? "#1e40af"
-                              : "#be185d",
-                          padding: "0.25rem 0.75rem",
-                          borderRadius: "999px",
-                          fontSize: "0.875rem",
-                          fontWeight: "600",
+                            patient.gender === 'male'
+                              ? '#1d4ed8'
+                              : patient.gender === 'female'
+                              ? '#be185d'
+                              : '#374151',
+                          padding: '0.3rem 0.75rem',
+                          borderRadius: '999px',
+                          fontSize: '0.85rem',
+                          fontWeight: '600',
+                          textTransform: 'capitalize',
                         }}
                       >
-                        {patient.gender}
+                        {patient.gender || 'Unknown'}
                       </span>
-                    ) : (
-                      "N/A"
-                    )}
-                  </td>
+                    </td>
 
-                  <td style={{ padding: "1rem" }}>
-                    {patient.blood_group ? (
+                    <td style={tdStyle}>
                       <span
                         style={{
-                          background: "#fee2e2",
-                          color: "#991b1b",
-                          padding: "0.25rem 0.75rem",
-                          borderRadius: "999px",
-                          fontSize: "0.875rem",
-                          fontWeight: "600",
+                          background: '#fee2e2',
+                          color: '#991b1b',
+                          padding: '0.3rem 0.75rem',
+                          borderRadius: '999px',
+                          fontSize: '0.85rem',
+                          fontWeight: '600',
                         }}
                       >
-                        {patient.blood_group}
+                        {patient.blood_group || 'N/A'}
                       </span>
-                    ) : (
-                      "N/A"
-                    )}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="5"
-                  style={{
-                    padding: "3rem",
-                    textAlign: "center",
-                    color: "#6b7280",
-                  }}
-                >
-                  No patients found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }
+
+// Reusable styles
+const thStyle = {
+  padding: '1rem 1.25rem',
+  textAlign: 'left',
+  fontWeight: '600',
+};
+
+const tdStyle = {
+  padding: '1rem 1.25rem',
+};

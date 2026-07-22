@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import Layout from '../components/Layout';
 
 export default function Doctors() {
+  const navigate = useNavigate();
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -73,24 +75,55 @@ export default function Doctors() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1rem',
             }}
           >
-            <h3 style={{ margin: 0, color: '#111827' }}>
-              Doctors Directory
-            </h3>
+            <div>
+              <h3 style={{ margin: 0, color: '#111827' }}>
+                Doctors Directory
+              </h3>
 
-            <span
-              style={{
-                background: '#dbeafe',
-                color: '#1d4ed8',
-                padding: '0.35rem 0.75rem',
-                borderRadius: '999px',
-                fontSize: '0.85rem',
-                fontWeight: '600',
-              }}
-            >
-              {doctors.length} Active
-            </span>
+              <p
+                style={{
+                  margin: '0.35rem 0 0',
+                  color: '#6b7280',
+                  fontSize: '0.9rem',
+                }}
+              >
+                Manage doctor profiles, specialization, chamber information, and availability.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span
+                style={{
+                  background: '#dbeafe',
+                  color: '#1d4ed8',
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: '999px',
+                  fontSize: '0.85rem',
+                  fontWeight: '600',
+                }}
+              >
+                {doctors.length} Active
+              </span>
+
+              <button
+                onClick={() => navigate('/doctors/new')}
+                style={{
+                  background: '#2563eb',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '10px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                }}
+              >
+                ➕ Add Doctor
+              </button>
+            </div>
           </div>
 
           {/* Table */}

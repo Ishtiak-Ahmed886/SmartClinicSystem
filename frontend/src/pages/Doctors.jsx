@@ -22,6 +22,27 @@ export default function Doctors() {
       setLoading(false);
     }
   };
+    const handleDelete = async (doctorId) => {
+    const confirmed = window.confirm(
+      'Are you sure you want to delete this doctor? This action cannot be undone.'
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await api.delete(`/doctors/${doctorId}/`);
+
+      // Remove deleted doctor from UI instantly
+      setDoctors((prev) =>
+        prev.filter((doctor) => doctor.id !== doctorId)
+      );
+
+      alert('Doctor deleted successfully!');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to delete doctor');
+    }
+  };
 
   if (loading) {
     return (
@@ -202,21 +223,38 @@ export default function Doctors() {
                         {doctor.is_available ? 'Available' : 'Unavailable'}
                       </span>
                     </td>
-                                        <td style={tdStyle}>
-                      <button
-                        onClick={() => navigate(`/doctors/${doctor.id}/edit`)}
-                        style={{
-                          background: '#2563eb',
-                          color: 'white',
-                          border: 'none',
-                          padding: '0.5rem 0.85rem',
-                          borderRadius: '8px',
-                          cursor: 'pointer',
-                          fontWeight: '600',
-                        }}
-                      >
-                        ✏️ Edit
-                      </button>
+                                                            <td style={tdStyle}>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                          onClick={() => navigate(`/doctors/${doctor.id}/edit`)}
+                          style={{
+                            background: '#2563eb',
+                            color: 'white',
+                            border: 'none',
+                            padding: '0.5rem 0.85rem',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: '600',
+                          }}
+                        >
+                          ✏️ Edit
+                        </button>
+
+                        <button
+                          onClick={() => handleDelete(doctor.id)}
+                          style={{
+                            background: '#dc2626',
+                            color: 'white',
+                            border: 'none',
+                            padding: '0.5rem 0.85rem',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: '600',
+                          }}
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

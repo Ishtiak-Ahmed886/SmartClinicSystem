@@ -1,22 +1,18 @@
-import { useEffect, useState } from "react";
-import api from "../api/axios";
+import { useEffect, useState } from 'react';
+import api from '../api/axios';
+import Layout from '../components/Layout';
 
 export default function Queue() {
   const [queues, setQueues] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchQueue();
-
-    // Auto refresh every 5 seconds
-    const interval = setInterval(fetchQueue, 5000);
-
-    return () => clearInterval(interval);
+    fetchQueues();
   }, []);
 
-  const fetchQueue = async () => {
+  const fetchQueues = async () => {
     try {
-      const response = await api.get("/queue/");
+      const response = await api.get('/queue/');
       setQueues(response.data.results || response.data);
     } catch (error) {
       console.error(error);
@@ -25,218 +21,226 @@ export default function Queue() {
     }
   };
 
-  const currentQueue = queues.find((q) => q.status === "in_progress");
-  const nextQueue = queues.find((q) => q.status === "waiting");
-  const waitingCount = queues.filter((q) => q.status === "waiting").length;
-  const completedCount = queues.filter(
-    (q) => q.status === "completed"
-  ).length;
-
   const getStatusStyle = (status) => {
     switch (status) {
-      case "in_progress":
-        return {
-          background: "#dbeafe",
-          color: "#1e40af",
-        };
-      case "waiting":
-        return {
-          background: "#fef3c7",
-          color: "#92400e",
-        };
-      case "completed":
-        return {
-          background: "#dcfce7",
-          color: "#166534",
-        };
-      case "cancelled":
-        return {
-          background: "#fee2e2",
-          color: "#991b1b",
-        };
+      case 'waiting':
+        return { background: '#fef3c7', color: '#92400e' };
+      case 'in_progress':
+        return { background: '#dbeafe', color: '#1d4ed8' };
+      case 'completed':
+        return { background: '#dcfce7', color: '#166534' };
+      case 'cancelled':
+        return { background: '#fee2e2', color: '#991b1b' };
       default:
-        return {
-          background: "#f3f4f6",
-          color: "#374151",
-        };
+        return { background: '#f3f4f6', color: '#374151' };
     }
   };
 
   if (loading) {
-    return <h2 style={{ padding: "2rem" }}>Loading queue...</h2>;
+    return (
+      <Layout>
+        <h2>Loading queue...</h2>
+      </Layout>
+    );
   }
 
   return (
-    <div
-      style={{
-        padding: "2rem",
-        background: "#f3f4f6",
-        minHeight: "100vh",
-      }}
-    >
-      <h1 style={{ marginBottom: "2rem", fontSize: "2rem" }}>
-        🎫 Live Queue Dashboard
-      </h1>
-
-      {/* Stats Cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "1.5rem",
-          marginBottom: "2rem",
-        }}
-      >
-        <div
-          style={{
-            background: "white",
-            padding: "1.5rem",
-            borderRadius: "16px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-          }}
-        >
-          <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>
-            Current Token
-          </div>
-          <div
+    <Layout>
+      <div>
+        {/* Header */}
+        <div style={{ marginBottom: '2rem' }}>
+          <h1
             style={{
-              fontSize: "2.5rem",
-              fontWeight: "bold",
-              color: "#2563eb",
+              margin: 0,
+              fontSize: '2rem',
+              color: '#111827',
             }}
           >
-            {currentQueue ? `#${currentQueue.token_number}` : "--"}
-          </div>
-        </div>
+            🎫 Queue Management
+          </h1>
 
-        <div
-          style={{
-            background: "white",
-            padding: "1.5rem",
-            borderRadius: "16px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-          }}
-        >
-          <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>
-            Next Token
-          </div>
-          <div
+          <p
             style={{
-              fontSize: "2.5rem",
-              fontWeight: "bold",
-              color: "#ea580c",
+              color: '#6b7280',
+              marginTop: '0.5rem',
             }}
           >
-            {nextQueue ? `#${nextQueue.token_number}` : "--"}
-          </div>
+            Monitor live queue activity, token progression, patient flow, and waiting status.
+          </p>
         </div>
 
+        {/* Table Card */}
         <div
           style={{
-            background: "white",
-            padding: "1.5rem",
-            borderRadius: "16px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            background: 'white',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.06)',
+            border: '1px solid #f1f5f9',
           }}
         >
-          <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>
-            Waiting Patients
-          </div>
+          {/* Card Header */}
           <div
             style={{
-              fontSize: "2.5rem",
-              fontWeight: "bold",
-              color: "#7c3aed",
+              padding: '1.25rem 1.5rem',
+              borderBottom: '1px solid #e5e7eb',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}
           >
-            {waitingCount}
-          </div>
-        </div>
+            <h3 style={{ margin: 0, color: '#111827' }}>
+              Live Queue Monitor
+            </h3>
 
-        <div
-          style={{
-            background: "white",
-            padding: "1.5rem",
-            borderRadius: "16px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-          }}
-        >
-          <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>
-            Completed Today
+            <span
+              style={{
+                background: '#fef3c7',
+                color: '#92400e',
+                padding: '0.35rem 0.75rem',
+                borderRadius: '999px',
+                fontSize: '0.85rem',
+                fontWeight: '600',
+              }}
+            >
+              {queues.filter((q) => q.status === 'waiting').length} Waiting
+            </span>
           </div>
-          <div
-            style={{
-              fontSize: "2.5rem",
-              fontWeight: "bold",
-              color: "#059669",
-            }}
-          >
-            {completedCount}
-          </div>
-        </div>
-      </div>
 
-      {/* Queue Table */}
-      <div
-        style={{
-          background: "white",
-          borderRadius: "16px",
-          overflow: "hidden",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-        }}
-      >
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead style={{ background: "#ea580c", color: "white" }}>
-            <tr>
-              <th style={{ padding: "1rem", textAlign: "left" }}>Token</th>
-              <th style={{ padding: "1rem", textAlign: "left" }}>Appointment ID</th>
-              <th style={{ padding: "1rem", textAlign: "left" }}>Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {queues.map((queue) => (
-              <tr
-                key={queue.id}
-                style={{ borderBottom: "1px solid #e5e7eb" }}
+          {/* Table */}
+          <div style={{ overflowX: 'auto' }}>
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+              }}
+            >
+              <thead
+                style={{
+                  background: '#2563eb',
+                  color: 'white',
+                }}
               >
-                <td style={{ padding: "1rem", fontWeight: "bold" }}>
-                  #{queue.token_number}
-                </td>
+                <tr>
+                  <th style={thStyle}>Queue ID</th>
+                  <th style={thStyle}>Token</th>
+                  <th style={thStyle}>Appointment</th>
+                  <th style={thStyle}>Status</th>
+                  <th style={thStyle}>Created</th>
+                </tr>
+              </thead>
 
-                <td style={{ padding: "1rem" }}>
-                  {queue.appointment}
-                </td>
-
-                <td style={{ padding: "1rem" }}>
-                  <span
+              <tbody>
+                {queues.map((queue) => (
+                  <tr
+                    key={queue.id}
                     style={{
-                      ...getStatusStyle(queue.status),
-                      padding: "0.35rem 0.85rem",
-                      borderRadius: "999px",
-                      fontSize: "0.875rem",
-                      fontWeight: "600",
-                      textTransform: "capitalize",
+                      borderBottom: '1px solid #f1f5f9',
                     }}
                   >
-                    {queue.status.replace("_", " ")}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    <td style={tdStyle}>
+                      <strong>{queue.id}</strong>
+                    </td>
 
-      <p
-        style={{
-          marginTop: "1rem",
-          color: "#6b7280",
-          fontSize: "0.875rem",
-        }}
-      >
-        🔄 Auto-refreshing every 5 seconds
-      </p>
-    </div>
+                    <td style={tdStyle}>
+                      <span
+                        style={{
+                          background: '#ede9fe',
+                          color: '#5b21b6',
+                          padding: '0.3rem 0.75rem',
+                          borderRadius: '999px',
+                          fontSize: '0.85rem',
+                          fontWeight: '700',
+                        }}
+                      >
+                        T-{queue.token_number}
+                      </span>
+                    </td>
+
+                    <td style={tdStyle}>
+                      #{queue.appointment}
+                    </td>
+
+                    <td style={tdStyle}>
+                      <span
+                        style={{
+                          ...getStatusStyle(queue.status),
+                          padding: '0.35rem 0.8rem',
+                          borderRadius: '999px',
+                          fontSize: '0.85rem',
+                          fontWeight: '600',
+                          textTransform: 'capitalize',
+                        }}
+                      >
+                        {queue.status.replace('_', ' ')}
+                      </span>
+                    </td>
+
+                    <td style={tdStyle}>
+                      {new Date(queue.created_at).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Live Summary */}
+        <div
+          style={{
+            marginTop: '2rem',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '1rem',
+          }}
+        >
+          <div style={summaryCard('#fef3c7')}>
+            <div style={{ fontSize: '2rem', fontWeight: '700' }}>
+              {queues.filter((q) => q.status === 'waiting').length}
+            </div>
+            <div style={{ color: '#92400e', fontWeight: '600' }}>
+              Waiting
+            </div>
+          </div>
+
+          <div style={summaryCard('#dbeafe')}>
+            <div style={{ fontSize: '2rem', fontWeight: '700' }}>
+              {queues.filter((q) => q.status === 'in_progress').length}
+            </div>
+            <div style={{ color: '#1d4ed8', fontWeight: '600' }}>
+              In Progress
+            </div>
+          </div>
+
+          <div style={summaryCard('#dcfce7')}>
+            <div style={{ fontSize: '2rem', fontWeight: '700' }}>
+              {queues.filter((q) => q.status === 'completed').length}
+            </div>
+            <div style={{ color: '#166534', fontWeight: '600' }}>
+              Completed
+            </div>
+          </div>
+        </div>
+      </div>
+    </Layout>
   );
 }
+
+// Reusable styles
+const thStyle = {
+  padding: '1rem 1.25rem',
+  textAlign: 'left',
+  fontWeight: '600',
+};
+
+const tdStyle = {
+  padding: '1rem 1.25rem',
+};
+
+const summaryCard = (bg) => ({
+  background: bg,
+  borderRadius: '16px',
+  padding: '1.25rem',
+  border: '1px solid rgba(0,0,0,0.05)',
+});

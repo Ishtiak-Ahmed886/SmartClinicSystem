@@ -148,6 +148,7 @@ export default function Doctors() {
                   <th style={thStyle}>Fee</th>
                   <th style={thStyle}>Chamber</th>
                   <th style={thStyle}>Status</th>
+                  <th style={thStyle}>Actions</th>
                 </tr>
               </thead>
 
@@ -200,6 +201,22 @@ export default function Doctors() {
                       >
                         {doctor.is_available ? 'Available' : 'Unavailable'}
                       </span>
+                    </td>
+                                        <td style={tdStyle}>
+                      <button
+                        onClick={() => navigate(`/doctors/${doctor.id}/edit`)}
+                        style={{
+                          background: '#2563eb',
+                          color: 'white',
+                          border: 'none',
+                          padding: '0.5rem 0.85rem',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontWeight: '600',
+                        }}
+                      >
+                        ✏️ Edit
+                      </button>
                     </td>
                   </tr>
                 ))}

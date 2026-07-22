@@ -8,6 +8,7 @@ import Appointments from "./pages/Appointments";
 import Queue from "./pages/Queue";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CreateDoctor from './pages/CreateDoctor';
+import EditDoctor from './pages/EditDoctor';
 
 export default function App() {
   return (
@@ -62,6 +63,7 @@ export default function App() {
           }
         />
         <Route path="/doctors/new" element={<CreateDoctor />} />
+        <Route path="/doctors/:id/edit" element={<EditDoctor />} />
       </Routes>
     </BrowserRouter>
   );

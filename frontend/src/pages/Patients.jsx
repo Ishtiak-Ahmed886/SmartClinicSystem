@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import Layout from '../components/Layout';
 
 export default function Patients() {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPatients();
@@ -12,10 +14,33 @@ export default function Patients() {
 
   const fetchPatients = async () => {
     try {
+      setLoading(true);
+
       const response = await api.get('/patients/');
-      setPatients(response.data.results || response.data);
+
+      console.log('FULL PATIENT RESPONSE:', response.data);
+
+      let patientData = [];
+
+      // Handle DRF paginated response
+      if (response.data && Array.isArray(response.data.results)) {
+        patientData = response.data.results;
+      }
+      // Handle normal array response
+      else if (Array.isArray(response.data)) {
+        patientData = response.data;
+      }
+
+      console.log('PATIENT COUNT:', patientData.length);
+      console.log('PATIENT DATA:', patientData);
+
+      // Sort newest first
+      const sortedPatients = patientData.sort((a, b) => b.id - a.id);
+
+      setPatients(sortedPatients);
     } catch (error) {
-      console.error(error);
+      console.error('Patient fetch failed:', error);
+      setPatients([]);
     } finally {
       setLoading(false);
     }
@@ -24,34 +49,63 @@ export default function Patients() {
   if (loading) {
     return (
       <Layout>
-        <h2>Loading patients...</h2>
+        <div style={{ padding: '2rem' }}>
+          <h2>Loading patients...</h2>
+        </div>
       </Layout>
     );
   }
 
   return (
     <Layout>
-      <div>
+      <div style={{ padding: '1rem' }}>
         {/* Header */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: '2rem',
-              color: '#111827',
-            }}
-          >
-            🧑‍🤝‍🧑 Patients Management
-          </h1>
+        <div
+          style={{
+            marginBottom: '2rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+          }}
+        >
+          <div>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: '2rem',
+                color: '#111827',
+              }}
+            >
+              👥 Patients Management
+            </h1>
 
-          <p
+            <p
+              style={{
+                color: '#6b7280',
+                marginTop: '0.5rem',
+              }}
+            >
+              Manage patient records, profiles, and medical information.
+            </p>
+          </div>
+
+          <button
+            onClick={() => navigate('/patients/new')}
             style={{
-              color: '#6b7280',
-              marginTop: '0.5rem',
+              background: '#2563eb',
+              color: 'white',
+              border: 'none',
+              padding: '0.85rem 1.25rem',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontWeight: '700',
+              fontSize: '0.95rem',
             }}
           >
-            Manage patient records, contact information, and medical profile data.
-          </p>
+            ➕ Add Patient
+          </button>
         </div>
 
         {/* Table Card */}
@@ -64,7 +118,6 @@ export default function Patients() {
             border: '1px solid #f1f5f9',
           }}
         >
-          {/* Card Header */}
           <div
             style={{
               padding: '1.25rem 1.5rem',
@@ -74,9 +127,7 @@ export default function Patients() {
               alignItems: 'center',
             }}
           >
-            <h3 style={{ margin: 0, color: '#111827' }}>
-              Patients Directory
-            </h3>
+            <h3 style={{ margin: 0 }}>Patients Directory</h3>
 
             <span
               style={{
@@ -84,7 +135,6 @@ export default function Patients() {
                 color: '#166534',
                 padding: '0.35rem 0.75rem',
                 borderRadius: '999px',
-                fontSize: '0.85rem',
                 fontWeight: '600',
               }}
             >
@@ -92,7 +142,6 @@ export default function Patients() {
             </span>
           </div>
 
-          {/* Table */}
           <div style={{ overflowX: 'auto' }}>
             <table
               style={{
@@ -116,65 +165,32 @@ export default function Patients() {
               </thead>
 
               <tbody>
-                {patients.map((patient) => (
-                  <tr
-                    key={patient.id}
-                    style={{
-                      borderBottom: '1px solid #f1f5f9',
-                    }}
-                  >
-                    <td style={tdStyle}>
-                      <strong>{patient.id}</strong>
-                    </td>
-
-                    <td style={tdStyle}>{patient.user}</td>
-
-                    <td style={tdStyle}>
-                      {patient.phone || 'N/A'}
-                    </td>
-
-                    <td style={tdStyle}>
-                      <span
-                        style={{
-                          background:
-                            patient.gender === 'male'
-                              ? '#dbeafe'
-                              : patient.gender === 'female'
-                              ? '#fce7f3'
-                              : '#f3f4f6',
-                          color:
-                            patient.gender === 'male'
-                              ? '#1d4ed8'
-                              : patient.gender === 'female'
-                              ? '#be185d'
-                              : '#374151',
-                          padding: '0.3rem 0.75rem',
-                          borderRadius: '999px',
-                          fontSize: '0.85rem',
-                          fontWeight: '600',
-                          textTransform: 'capitalize',
-                        }}
-                      >
-                        {patient.gender || 'Unknown'}
-                      </span>
-                    </td>
-
-                    <td style={tdStyle}>
-                      <span
-                        style={{
-                          background: '#fee2e2',
-                          color: '#991b1b',
-                          padding: '0.3rem 0.75rem',
-                          borderRadius: '999px',
-                          fontSize: '0.85rem',
-                          fontWeight: '600',
-                        }}
-                      >
-                        {patient.blood_group || 'N/A'}
-                      </span>
+                {patients.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan='5'
+                      style={{
+                        padding: '3rem',
+                        textAlign: 'center',
+                        color: '#6b7280',
+                      }}
+                    >
+                      No patients found
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  patients.map((patient) => (
+                    <tr key={patient.id}>
+                      <td style={tdStyle}>{patient.id}</td>
+                      <td style={tdStyle}>{patient.user}</td>
+                      <td style={tdStyle}>{patient.phone || 'N/A'}</td>
+                      <td style={tdStyle}>{patient.gender || 'Unknown'}</td>
+                      <td style={tdStyle}>
+                        {patient.blood_group || 'N/A'}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -184,7 +200,6 @@ export default function Patients() {
   );
 }
 
-// Reusable styles
 const thStyle = {
   padding: '1rem 1.25rem',
   textAlign: 'left',

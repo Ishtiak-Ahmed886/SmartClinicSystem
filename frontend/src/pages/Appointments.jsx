@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import Layout from '../components/Layout';
 
 export default function Appointments() {
+  const navigate = useNavigate();
+
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -12,10 +15,22 @@ export default function Appointments() {
 
   const fetchAppointments = async () => {
     try {
-      const response = await api.get('/appointments/');
-      setAppointments(response.data.results || response.data);
+      setLoading(true);
+
+      const response = await api.get('/appointments/?page_size=100');
+
+      console.log('FULL APPOINTMENT RESPONSE:', response.data);
+
+      const appointmentData = response.data.results || response.data || [];
+      console.log('RESULT IDS:', appointmentData.map(a => a.id));
+
+      // Newest appointment first
+      const sorted = [...appointmentData].sort((a, b) => b.id - a.id);
+
+      setAppointments(sorted);
     } catch (error) {
-      console.error(error);
+      console.error('Appointment fetch failed:', error);
+      setAppointments([]);
     } finally {
       setLoading(false);
     }
@@ -58,34 +73,65 @@ export default function Appointments() {
   if (loading) {
     return (
       <Layout>
-        <h2>Loading appointments...</h2>
+        <div style={{ padding: '2rem' }}>
+          <h2>Loading appointments...</h2>
+        </div>
       </Layout>
     );
   }
 
   return (
     <Layout>
-      <div>
+      <div style={{ padding: '1rem' }}>
         {/* Header */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: '2rem',
-              color: '#111827',
-            }}
-          >
-            📅 Appointments Management
-          </h1>
+        <div
+          style={{
+            marginBottom: '2rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+          }}
+        >
+          <div>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: '2rem',
+                color: '#111827',
+              }}
+            >
+              📅 Appointments Management
+            </h1>
 
-          <p
+            <p
+              style={{
+                color: '#6b7280',
+                marginTop: '0.5rem',
+              }}
+            >
+              Monitor booking activity, appointment workflow, token generation,
+              and patient scheduling.
+            </p>
+          </div>
+
+          <button
+            onClick={() => navigate('/appointments/new')}
             style={{
-              color: '#6b7280',
-              marginTop: '0.5rem',
+              background: '#2563eb',
+              color: 'white',
+              border: 'none',
+              padding: '0.85rem 1.25rem',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontWeight: '700',
+              fontSize: '0.95rem',
+              boxShadow: '0 4px 12px rgba(37,99,235,0.25)',
             }}
           >
-            Monitor booking activity, appointment workflow, token generation, and patient scheduling.
-          </p>
+            📅 Book Appointment
+          </button>
         </div>
 
         {/* Table Card */}
@@ -182,7 +228,7 @@ export default function Appointments() {
                           fontWeight: '700',
                         }}
                       >
-                        #{appointment.token_number}
+                        #{appointment.id}
                       </span>
                     </td>
 

@@ -5,6 +5,14 @@ import Layout from '../components/Layout';
 export default function Queue() {
   const [queues, setQueues] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [callingNext, setCallingNext] = useState(false);
+
+  const [summary, setSummary] = useState({
+    now_serving: null,
+    waiting_count: 0,
+    completed_count: 0,
+    total_queue: 0,
+  });
 
   useEffect(() => {
     fetchQueues();
@@ -12,8 +20,13 @@ export default function Queue() {
 
   const fetchQueues = async () => {
     try {
-      const response = await api.get('/queue/');
-      setQueues(response.data.results || response.data);
+      const [queueRes, summaryRes] = await Promise.all([
+        api.get('/queue/'),
+        api.get('/queue/summary/'),
+      ]);
+
+      setQueues(queueRes.data.results || queueRes.data || []);
+      setSummary(summaryRes.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -48,25 +61,70 @@ export default function Queue() {
     <Layout>
       <div>
         {/* Header */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: '2rem',
-              color: '#111827',
-            }}
-          >
-            🎫 Queue Management
-          </h1>
+        <div
+          style={{
+            marginBottom: '2rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+          }}
+        >
+          <div>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: '2rem',
+                color: '#111827',
+              }}
+            >
+              🎫 Queue Management
+            </h1>
 
-          <p
+            <p
+              style={{
+                color: '#6b7280',
+                marginTop: '0.5rem',
+              }}
+            >
+              Monitor live queue activity, token progression, patient flow, and
+              waiting status.
+            </p>
+          </div>
+
+          <button
+            onClick={async () => {
+              try {
+                setCallingNext(true);
+
+                const response = await api.post('/queue/next/');
+
+                alert(response.data.message);
+
+                fetchQueues();
+              } catch (error) {
+                console.error(error);
+                alert('Failed to call next patient');
+              } finally {
+                setCallingNext(false);
+              }
+            }}
+            disabled={callingNext}
             style={{
-              color: '#6b7280',
-              marginTop: '0.5rem',
+              background: callingNext ? '#94a3b8' : '#2563eb',
+              color: 'white',
+              border: 'none',
+              padding: '0.9rem 1.4rem',
+              borderRadius: '12px',
+              cursor: callingNext ? 'not-allowed' : 'pointer',
+              fontWeight: '700',
+              fontSize: '1rem',
+              boxShadow: '0 6px 16px rgba(37,99,235,0.25)',
             }}
           >
-            Monitor live queue activity, token progression, patient flow, and waiting status.
-          </p>
+            {callingNext ? '⏳ Calling...' : '📢 Call Next Patient'}
+          </button>
         </div>
 
         {/* Table Card */}
@@ -195,6 +253,23 @@ export default function Queue() {
             gap: '1rem',
           }}
         >
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+              color: 'white',
+              borderRadius: '16px',
+              padding: '1.25rem',
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ fontSize: '2rem', fontWeight: '700' }}>
+              {summary.now_serving ? `#${summary.now_serving}` : '--'}
+            </div>
+
+            <div style={{ opacity: 0.9, fontWeight: '600' }}>
+              🔴 Now Serving
+            </div>
+          </div>
           <div style={summaryCard('#fef3c7')}>
             <div style={{ fontSize: '2rem', fontWeight: '700' }}>
               {queues.filter((q) => q.status === 'waiting').length}

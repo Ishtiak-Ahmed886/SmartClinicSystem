@@ -29,8 +29,15 @@ export default function Appointments() {
 
       setAppointments(sorted);
     } catch (error) {
-      console.error('Appointment fetch failed:', error);
-      setAppointments([]);
+      console.error(error);
+
+      console.log(error.response);
+
+      alert(
+        error.response?.data?.detail ||
+        JSON.stringify(error.response?.data) ||
+        "Failed to update status"
+      );
     } finally {
       setLoading(false);
     }
@@ -43,6 +50,7 @@ export default function Appointments() {
           background: '#dcfce7',
           color: '#166534',
         };
+
 
       case 'pending':
         return {
@@ -79,6 +87,41 @@ export default function Appointments() {
       </Layout>
     );
   }
+  const updateStatus = async (id, status) => {
+    console.log("========== UPDATE STATUS ==========");
+    console.log("Appointment ID:", id);
+    console.log("New Status:", status);
+
+    try {
+      const response = await api.patch(
+        `/appointments/${id}/status/`,
+        {
+          status: status,
+        }
+      );
+
+      console.log("✅ SUCCESS");
+      console.log("Status Code:", response.status);
+      console.log("Response:", response.data);
+
+      fetchAppointments();
+
+    } catch (error) {
+      console.log("❌ REQUEST FAILED");
+
+      console.log("Full Error:", error);
+
+      if (error.response) {
+        console.log("HTTP Status:", error.response.status);
+        console.log("Response Data:", error.response.data);
+
+        alert(JSON.stringify(error.response.data));
+      } else {
+        console.log("No response from server");
+        alert("Server not responding");
+      }
+    }
+  };
 
   return (
     <Layout>
@@ -194,6 +237,7 @@ export default function Appointments() {
                   <th style={thStyle}>Doctor</th>
                   <th style={thStyle}>Patient</th>
                   <th style={thStyle}>Status</th>
+                  <th style={thStyle}>Actions</th>
                 </tr>
               </thead>
 
@@ -253,6 +297,23 @@ export default function Appointments() {
                       >
                         {appointment.status}
                       </span>
+                    </td>
+                    <td style={tdStyle}>
+                      <select
+                        value={appointment.status}
+                        onChange={(e) =>
+                          updateStatus(appointment.id, e.target.value)
+                        }
+                        style={{
+                          padding: '6px',
+                          borderRadius: '8px',
+                        }}
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
                     </td>
                   </tr>
                 ))}

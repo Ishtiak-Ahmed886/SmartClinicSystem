@@ -97,15 +97,18 @@ class Appointment(models.Model):
         # Validation
         self.full_clean()
 
-        # Auto Token
+        # Auto Token Generation
         if not self.token_number:
 
-            last_token = Appointment.objects.filter(
+            last_appointment = Appointment.objects.filter(
                 doctor=self.doctor,
                 appointment_date=self.appointment_date,
-            ).count()
+            ).order_by("-token_number").first()
 
-            self.token_number = last_token + 1
+            if last_appointment:
+                self.token_number = last_appointment.token_number + 1
+            else:
+                self.token_number = 1
 
         # Save Appointment
         super().save(*args, **kwargs)
@@ -116,8 +119,9 @@ class Appointment(models.Model):
         Queue.objects.get_or_create(
             appointment=self,
             defaults={
-                "queue_number": self.token_number,
-            }
+                "token_number": self.token_number,
+                "status": "waiting",
+            },
         )
 
     def __str__(self):

@@ -53,9 +53,11 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -165,7 +167,7 @@ REST_FRAMEWORK = {
         "rest_framework.pagination.PageNumberPagination"
     ),
 
-    "PAGE_SIZE": 5,
+    "PAGE_SIZE": 100,
 }
 
 
@@ -193,3 +195,9 @@ SIMPLE_JWT = {
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True

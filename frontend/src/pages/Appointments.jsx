@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import Layout from '../components/Layout';
@@ -8,38 +8,66 @@ export default function Appointments() {
 
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [doctorFilter, setDoctorFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+
+  const searchTimeout = useRef(null);
 
   useEffect(() => {
-    fetchAppointments();
-  }, []);
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    searchTimeout.current = setTimeout(() => {
+      fetchAppointments();
+    }, 500);
+
+    return () => clearTimeout(searchTimeout.current);
+
+  }, [
+    search,
+    statusFilter,
+    doctorFilter,
+    dateFilter,
+  ]);
 
   const fetchAppointments = async () => {
     try {
-      setLoading(true);
+      if (appointments.length === 0) {
+        setLoading(true);
+      }
 
-      const response = await api.get('/appointments/?page_size=100');
+      let url = "/appointments/?page_size=100";
 
-      console.log('FULL APPOINTMENT RESPONSE:', response.data);
+      if (statusFilter) {
+        url += `&status=${statusFilter}`;
+      }
+
+      if (doctorFilter) {
+        url += `&doctor=${doctorFilter}`;
+      }
+
+      if (dateFilter) {
+        url += `&appointment_date=${dateFilter}`;
+      }
+
+      if (search) {
+        url += `&search=${search}`;
+      }
+
+      const response = await api.get(url);
 
       const appointmentData = response.data.results || response.data || [];
-      console.log('RESULT IDS:', appointmentData.map(a => a.id));
 
-      // Newest appointment first
-      const sorted = [...appointmentData].sort((a, b) => b.id - a.id);
-
-      setAppointments(sorted);
+      setAppointments(appointmentData);
     } catch (error) {
       console.error(error);
-
-      console.log(error.response);
-
-      alert(
-        error.response?.data?.detail ||
-        JSON.stringify(error.response?.data) ||
-        "Failed to update status"
-      );
     } finally {
-      setLoading(false);
+      if (appointments.length === 0) {
+        setLoading(false);
+      }
     }
   };
 
@@ -87,40 +115,22 @@ export default function Appointments() {
       </Layout>
     );
   }
+
   const updateStatus = async (id, status) => {
-    console.log("========== UPDATE STATUS ==========");
-    console.log("Appointment ID:", id);
-    console.log("New Status:", status);
+    const response = await api.patch(
+      `/appointments/${id}/status/`,
+      { status }
+    );
 
-    try {
-      const response = await api.patch(
-        `/appointments/${id}/status/`,
-        {
-          status: status,
-        }
-      );
+    const updated = response.data;
 
-      console.log("✅ SUCCESS");
-      console.log("Status Code:", response.status);
-      console.log("Response:", response.data);
+    // console.log('Updated appointment:', updated);
 
-      fetchAppointments();
-
-    } catch (error) {
-      console.log("❌ REQUEST FAILED");
-
-      console.log("Full Error:", error);
-
-      if (error.response) {
-        console.log("HTTP Status:", error.response.status);
-        console.log("Response Data:", error.response.data);
-
-        alert(JSON.stringify(error.response.data));
-      } else {
-        console.log("No response from server");
-        alert("Server not responding");
-      }
-    }
+    setAppointments(prev =>
+      prev.map(item =>
+        item.id === id ? updated : item
+      )
+    );
   };
 
   return (
@@ -177,6 +187,92 @@ export default function Appointments() {
           </button>
         </div>
 
+        <div
+          style={{
+            background: "white",
+            padding: "1rem",
+            borderRadius: "16px",
+            marginBottom: "1.5rem",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            display: "flex",
+            gap: "1rem",
+            flexWrap: "wrap",
+          }}
+        >
+          <input
+            type="text"
+            placeholder="🔍 Search Notes..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              flex: 1,
+              minWidth: "220px",
+              padding: "10px",
+              borderRadius: "8px",
+              border: "1px solid #d1d5db",
+            }}
+          />
+
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            style={{
+              padding: "10px",
+              borderRadius: "8px",
+              border: "1px solid #d1d5db",
+            }}
+          >
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+
+          <input
+            type="number"
+            placeholder="Doctor ID"
+            value={doctorFilter}
+            onChange={(e) => setDoctorFilter(e.target.value)}
+            style={{
+              width: "120px",
+              padding: "10px",
+              borderRadius: "8px",
+              border: "1px solid #d1d5db",
+            }}
+          />
+
+          <input
+            type="date"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            style={{
+              padding: "10px",
+              borderRadius: "8px",
+              border: "1px solid #d1d5db",
+            }}
+          />
+
+          <button
+            onClick={() => {
+              setSearch("");
+              setStatusFilter("");
+              setDoctorFilter("");
+              setDateFilter("");
+            }}
+            style={{
+              background: "#ef4444",
+              color: "white",
+              border: "none",
+              padding: "10px 16px",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Reset
+          </button>
+        </div>
         {/* Table Card */}
         <div
           style={{

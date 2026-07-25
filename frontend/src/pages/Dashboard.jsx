@@ -27,7 +27,7 @@ export default function Dashboard() {
 
   const fetchLiveQueue = async () => {
     try {
-      const response = await api.get('/queues/summary/');
+      const response = await api.get('/queues/summary');
       setLiveQueue(response.data);
     } catch (error) {
       console.error('Live queue fetch failed:', error);

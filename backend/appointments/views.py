@@ -1,4 +1,7 @@
+from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework import generics, status
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -8,9 +11,42 @@ from .serializers import AppointmentSerializer
 
 class AppointmentListCreateAPIView(generics.ListCreateAPIView):
 
-    queryset = Appointment.objects.all()
+    queryset = Appointment.objects.all().order_by("id")
 
     serializer_class = AppointmentSerializer
+
+    filter_backends = [
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter,
+    ]
+
+    ordering = ["id"]
+
+    filterset_fields = [
+        "status",
+        "doctor",
+        "patient",
+        "appointment_date",
+    ]
+
+    search_fields = [
+        "notes",
+        "status",
+        "token_number",
+        "doctor__user__first_name",
+        "doctor__user__last_name",
+        "doctor__user__username",
+        "patient__user__first_name",
+        "patient__user__last_name",
+
+    ]
+
+    ordering_fields = [
+        "appointment_date",
+        "appointment_time",
+        "token_number",
+    ]
 
 
 class AppointmentRetrieveUpdateDestroyAPIView(

@@ -124,7 +124,7 @@ export default function Appointments() {
 
     const updated = response.data;
 
-    // console.log('Updated appointment:', updated);
+    console.log("Updated appointment:", updated);
 
     setAppointments(prev =>
       prev.map(item =>

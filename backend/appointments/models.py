@@ -113,7 +113,9 @@ class Appointment(models.Model):
         # Save Appointment
         super().save(*args, **kwargs)
 
-        # Auto Create Queue
+        update_fields = kwargs.get("update_fields")
+        if update_fields and "status" in update_fields:
+            return  # Skip queue creation if only status is updated
         from queues.models import Queue
 
         Queue.objects.get_or_create(
@@ -123,6 +125,8 @@ class Appointment(models.Model):
                 "status": "waiting",
             },
         )
+
+    
 
     def __str__(self):
         return (

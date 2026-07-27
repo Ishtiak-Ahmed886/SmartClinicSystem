@@ -1,8 +1,11 @@
 from django.db import models
+
 from accounts.models import User
 
 
+
 class Patient(models.Model):
+
     BLOOD_GROUP_CHOICES = (
         ("A+", "A+"),
         ("A-", "A-"),
@@ -13,6 +16,8 @@ class Patient(models.Model):
         ("O+", "O+"),
         ("O-", "O-"),
     )
+
+    
 
     user = models.OneToOneField(
         User,
@@ -26,13 +31,21 @@ class Patient(models.Model):
         blank=True,
     )
 
-    emergency_contact = models.CharField(max_length=15)
+    emergency_contact = models.CharField(
+        max_length=15,
+    )
 
-    medical_history = models.TextField(blank=True)
+    medical_history = models.TextField(
+        blank=True,
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
 
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
 
     def __str__(self):
         return self.user.get_full_name() or self.user.username

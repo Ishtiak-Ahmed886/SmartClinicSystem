@@ -24,6 +24,7 @@ class AppointmentListCreateAPIView(generics.ListCreateAPIView):
     ordering = ["id"]
 
     filterset_fields = [
+        "clinic",
         "status",
         "doctor",
         "patient",
@@ -34,6 +35,7 @@ class AppointmentListCreateAPIView(generics.ListCreateAPIView):
         "notes",
         "status",
         "token_number",
+        "clinic__name",
         "doctor__user__first_name",
         "doctor__user__last_name",
         "doctor__user__username",
@@ -46,6 +48,7 @@ class AppointmentListCreateAPIView(generics.ListCreateAPIView):
         "appointment_date",
         "appointment_time",
         "token_number",
+        "clinic",
     ]
 
 

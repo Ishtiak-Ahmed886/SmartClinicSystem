@@ -7,18 +7,22 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     list_display = (
         "id",
+        "clinic",
         "name",
         "is_active",
     )
 
     search_fields = (
         "name",
+        "clinic__name",
     )
 
     list_filter = (
+        "clinic",
         "is_active",
     )
 
     ordering = (
+        "clinic",
         "name",
     )

@@ -8,9 +8,15 @@ urlpatterns = [
 
     path("api/", include("accounts.urls")),
 
+    path("api/clinics/", include("clinics.urls")),
+
     path("api/doctors/", include("doctors.urls")),
 
+    path("api/departments/", include("departments.urls")),
+
     path("api/patients/", include("patients.urls")),
+
+    path("api/schedules/", include("schedules.urls")),
     
     path("api/appointments/", include("appointments.urls")),
 

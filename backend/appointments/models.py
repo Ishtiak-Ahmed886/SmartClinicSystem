@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from clinics.models import Clinic
 
 from doctors.models import Doctor
 from patients.models import Patient
@@ -14,6 +15,14 @@ class Appointment(models.Model):
         ("completed", "Completed"),
         ("cancelled", "Cancelled"),
     )
+    clinic = models.ForeignKey(
+        Clinic,
+        on_delete=models.CASCADE,
+        related_name="appointments",
+        null=True,
+        blank=True,
+    )
+
 
     doctor = models.ForeignKey(
         Doctor,
@@ -62,6 +71,15 @@ class Appointment(models.Model):
         if not self.doctor_id or not self.patient_id or not self.appointment_date:
             return
 
+
+        #Doctor & Clinic Match Check
+        if self.doctor.clinic_id != self.clinic_id:
+            if self.doctor.user.clinic_id != self.clinic_id:
+                raise ValidationError(
+                    "Selected doctor does not belong to the selected clinic."
+                )
+        
+ 
         # Duplicate Appointment Check
         if Appointment.objects.filter(
             doctor_id=self.doctor_id,

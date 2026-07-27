@@ -11,9 +11,17 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
 
+        clinic = data.get("clinic")
         doctor = data.get("doctor")
         appointment_date = data.get("appointment_date")
         appointment_time = data.get("appointment_time")
+
+        # Doctor must belong to the selected clinic
+        if doctor and clinic:
+            if doctor.user.clinic_id != clinic.id:
+                    raise serializers.ValidationError(
+                        "Selected doctor does not belong to the selected clinic."
+                    )
 
         queryset = Appointment.objects.filter(
             doctor=doctor,

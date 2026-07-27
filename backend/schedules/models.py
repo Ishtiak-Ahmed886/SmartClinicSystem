@@ -33,5 +33,15 @@ class DoctorSchedule(models.Model):
 
     is_available = models.BooleanField(default=True)
 
+    class Meta:
+        ordering = ["doctor", "day", "start_time"]
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["doctor", "day", "start_time"],
+                name="unique_schedule_per_doctor"
+            )
+        ]
+
     def __str__(self):
         return f"{self.doctor} - {self.day}"

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from clinics.models import Clinic
 
 
 class User(AbstractUser):
@@ -18,3 +19,11 @@ class User(AbstractUser):
         choices=ROLE_CHOICES,
         default="patient",
     )
+
+    clinic = models.ForeignKey(
+    Clinic,
+    on_delete=models.CASCADE,
+    related_name="users",
+    null=True,
+    blank=True,
+)

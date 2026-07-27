@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import DoctorSchedule
 
 
@@ -21,5 +22,13 @@ class DoctorScheduleAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
+        "doctor__user__first_name",
+        "doctor__user__last_name",
         "doctor__user__username",
+    )
+
+    ordering = (
+        "doctor",
+        "day",
+        "start_time",
     )

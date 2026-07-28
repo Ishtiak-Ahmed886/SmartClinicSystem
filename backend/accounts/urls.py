@@ -5,7 +5,11 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from .views import UserListAPIView
+from .views import (
+    UserListAPIView,
+    CurrentUserAPIView,
+    PatientRegistrationAPIView,
+)
 
 urlpatterns = [
     # User List API
@@ -13,6 +17,18 @@ urlpatterns = [
         "users/",
         UserListAPIView.as_view(),
         name="user-list",
+    ),
+    
+    path(
+    "me/",
+    CurrentUserAPIView.as_view(),
+    name="current-user",
+    ),
+    # Patient Registration API
+    path(
+        "register/patient/",
+        PatientRegistrationAPIView.as_view(),
+        name="patient-registration",
     ),
 
     # JWT Login API

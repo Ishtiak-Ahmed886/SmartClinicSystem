@@ -10,16 +10,17 @@ class CustomUserAdmin(UserAdmin):
     list_display = (
         "id",
         "username",
+        "dev_password",
         "email",
         "phone",
         "role",
-        "is_staff",
+        "clinic",
         "is_active",
     )
 
     list_filter = (
         "role",
-        "is_staff",
+        "clinic",
         "is_active",
     )
 
@@ -29,7 +30,9 @@ class CustomUserAdmin(UserAdmin):
         "phone",
     )
 
-    ordering = ("id",)
+    ordering = (
+        "id",
+    )
 
     fieldsets = UserAdmin.fieldsets + (
         (
@@ -38,6 +41,8 @@ class CustomUserAdmin(UserAdmin):
                 "fields": (
                     "phone",
                     "role",
+                    "clinic",
+                    "dev_password",
                 )
             },
         ),
@@ -50,6 +55,8 @@ class CustomUserAdmin(UserAdmin):
                 "fields": (
                     "phone",
                     "role",
+                    "clinic",
+                    "dev_password",
                 )
             },
         ),

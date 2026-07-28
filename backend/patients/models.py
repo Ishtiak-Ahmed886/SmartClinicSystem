@@ -33,6 +33,7 @@ class Patient(models.Model):
 
     emergency_contact = models.CharField(
         max_length=15,
+        blank=True,
     )
 
     medical_history = models.TextField(

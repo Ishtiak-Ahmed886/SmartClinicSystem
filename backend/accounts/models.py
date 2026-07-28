@@ -12,7 +12,9 @@ class User(AbstractUser):
         ("receptionist", "Receptionist"),
     )
 
-    phone = models.CharField(max_length=15)
+    phone = models.CharField(
+        max_length=15,
+    )
 
     role = models.CharField(
         max_length=20,
@@ -21,9 +23,20 @@ class User(AbstractUser):
     )
 
     clinic = models.ForeignKey(
-    Clinic,
-    on_delete=models.CASCADE,
-    related_name="users",
-    null=True,
-    blank=True,
-)
+        Clinic,
+        on_delete=models.CASCADE,
+        related_name="users",
+        null=True,
+        blank=True,
+    )
+
+    # DEVELOPMENT ONLY
+    # Project complete হলে এই field remove করা হবে
+    dev_password = models.CharField(
+        max_length=128,
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return self.get_full_name() or self.username

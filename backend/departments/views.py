@@ -2,16 +2,20 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter, SearchFilter
+from core.mixins import ClinicQuerySetMixin
+from core.create_mixins import ClinicCreateMixin
 
 from .models import Department
 from .serializers import DepartmentSerializer
 
 
-class DepartmentListCreateAPIView(generics.ListCreateAPIView):
+class DepartmentListCreateAPIView( ClinicQuerySetMixin,ClinicCreateMixin,
+generics.ListCreateAPIView):
 
     queryset = Department.objects.all()
 
     serializer_class = DepartmentSerializer
+    clinic_field = "clinic"
 
     filter_backends = [
         DjangoFilterBackend,
@@ -40,13 +44,7 @@ class DepartmentListCreateAPIView(generics.ListCreateAPIView):
     ]
 
     
-    def get_queryset(self):
-
-        queryset = Department.objects.all()
-        clinic_id = self.request.query_params.get("clinic_id")
-        if clinic_id:
-            queryset = queryset.filter(clinic_id=clinic_id)
-        return queryset
+    
 
 
 class DepartmentRetrieveUpdateDestroyAPIView(

@@ -18,7 +18,7 @@ class Queue(models.Model):
         related_name="queue_entry",
     )
 
-    token_number = models.PositiveIntegerField(unique=True)
+    token_number = models.PositiveIntegerField()
 
     status = models.CharField(
         max_length=20,

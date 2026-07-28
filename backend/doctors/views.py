@@ -3,15 +3,24 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter, SearchFilter
 
+from core.mixins import ClinicQuerySetMixin
+from core.create_mixins import ClinicCreateMixin
+
 from .models import Doctor
 from .serializers import DoctorSerializer
 
 
-class DoctorListCreateAPIView(generics.ListCreateAPIView):
+class DoctorListCreateAPIView(
+    ClinicQuerySetMixin,
+    ClinicCreateMixin,
+    generics.ListCreateAPIView,
+):
 
     queryset = Doctor.objects.all()
 
     serializer_class = DoctorSerializer
+
+    clinic_field = "clinic"
 
     filter_backends = [
         DjangoFilterBackend,
@@ -20,7 +29,6 @@ class DoctorListCreateAPIView(generics.ListCreateAPIView):
     ]
 
     filterset_fields = [
-        "clinic",
         "department",
         "is_available",
     ]
@@ -32,11 +40,6 @@ class DoctorListCreateAPIView(generics.ListCreateAPIView):
         "specialization",
     ]
 
-    filterset_fields = [
-        "department",
-        "user__clinic",
-    ]
-
     ordering_fields = [
         "consultation_fee",
         "experience",
@@ -46,25 +49,16 @@ class DoctorListCreateAPIView(generics.ListCreateAPIView):
         "id",
     ]
 
-    def get_queryset(self):
-
-        queryset = Doctor.objects.all()
-        clinic = self.request.query_params.get("clinic")
-        department = self.request.query_params.get("department")
-        if clinic:
-            queryset = queryset.filter(clinic_id=clinic)
-        if department:
-            queryset = queryset.filter(department_id=department)
-        return queryset
-
 
 class DoctorRetrieveUpdateDestroyAPIView(
-    generics.RetrieveUpdateDestroyAPIView
+    ClinicQuerySetMixin,
+    generics.RetrieveUpdateDestroyAPIView,
 ):
 
     queryset = Doctor.objects.all()
 
     serializer_class = DoctorSerializer
 
+    clinic_field = "clinic"
 
    

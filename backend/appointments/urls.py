@@ -4,6 +4,7 @@ from .views import (
     AppointmentListCreateAPIView,
     AppointmentRetrieveUpdateDestroyAPIView,
     AppointmentStatusUpdateAPIView,
+    MyAppointmentAPIView,
 )
 
 urlpatterns = [
@@ -11,6 +12,12 @@ urlpatterns = [
         "",
         AppointmentListCreateAPIView.as_view(),
         name="appointment-list-create",
+    ),
+
+     path(
+        "my/",
+        MyAppointmentAPIView.as_view(),
+        name="my-appointments",
     ),
 
     path(

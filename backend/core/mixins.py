@@ -16,33 +16,19 @@ class ClinicQuerySetMixin:
 
         user = self.request.user
 
-        print("\n========== DEBUG ==========")
-        print("Username:", user.username)
-        print("Authenticated:", user.is_authenticated)
-        print("Superuser:", user.is_superuser)
-        print("Clinic ID:", user.clinic_id)
-        print("Clinic Field:", self.clinic_field)
-        print("Query Count Before:", queryset.count())
-
         if not user.is_authenticated:
-            print("User not authenticated")
             return queryset.none()
 
         if user.is_superuser:
-            print("Superuser detected")
             return queryset
 
         if user.clinic is None:
-            print("User has no clinic")
             return queryset.none()
 
         filtered_queryset = queryset.filter(
             **{
                 self.clinic_field: user.clinic
             }
-        )
-
-        print("Query Count After:", filtered_queryset.count())
-        print("===========================\n")
+        ).distinct()
 
         return filtered_queryset

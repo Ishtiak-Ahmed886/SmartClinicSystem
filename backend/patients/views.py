@@ -20,7 +20,7 @@ class PatientListCreateAPIView(
         IsAuthenticated,
     ]
 
-    clinic_field = "user__clinic"
+    clinic_field = "appointments__clinic"
 
 
 class PatientRetrieveUpdateDestroyAPIView(
@@ -36,6 +36,6 @@ class PatientRetrieveUpdateDestroyAPIView(
         IsAuthenticated,
     ]
 
-    clinic_field = "user__clinic"
+    clinic_field = "appointments__clinic"
 
 
